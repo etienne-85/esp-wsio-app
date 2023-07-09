@@ -1,5 +1,5 @@
 import { ESP32_PINOUT } from "../pinout_config"
-import { GpioInterface, GpioStateStub } from "../services/GpioInterface"
+import { GpioInterface, GpioPinStub } from "../services/GpioInterface"
 
 enum PIN_MODE {
     NONE, // 0b00
@@ -17,13 +17,14 @@ enum PIN_FEATURES {
 // }
 
 export enum PIN_TYPE {
+    REGULAR,
     PWM
 }
 
 // GPIO class
 export class Gpio {
     pin
-    state: GpioStateStub    // reflect pin state on device
+    state: GpioPinStub    // reflect pin state on device
 
     constructor(pin) {
         // console.log(`[Gpio::constructor] PIN #${pin} `)
@@ -31,16 +32,19 @@ export class Gpio {
     }
 
     init() {
-        // get current state from device 
-        this.state = GpioInterface.dumpPinState()
+        // get current pin state from device 
+        // const msgId = GpioInterface.dumpState([this.pin])
         // if inactive init on device
         if (!this.state) {
             this.state = {
-                pin: this.pin,
-                type: undefined,
-                val: 0
+                id: this.pin,
+                default: 0,
+                val: 0,
+                type: PIN_TYPE.REGULAR,
+                op: 'a'
             }
-            GpioInterface.initPinState(this.state)
+            // GpioInterface.dumpState([this.state])
+            GpioInterface.sendPinsBatch([this.state])
         } else {
             console.warn(`${this.pin} already active. To reinit, disable first`)
         }
@@ -57,13 +61,18 @@ export class Gpio {
 
     // synced with device
     get syncValue() {
-        this.value = GpioInterface.readPinValue(this.pin)
+        this.value = GpioInterface.read(this.pin)
         return this.value
     }
 
     set syncValue(val) {
         this.value = val
-        GpioInterface.writePinValue(this.pin, val)
+        const pinData = {
+            id: this.pin,
+            op: 'w',
+            val
+        }
+        GpioInterface.sendPinsBatch([pinData])
     }
 }
 
@@ -71,16 +80,21 @@ export class GpioPWM extends Gpio {
     // overload init
     init(pwmChan) {
         // get current state from device 
-        this.state = GpioInterface.dumpPinState(this.pin)
+        // const msgId = GpioInterface.dumpState([this.pin])
+        // wait for answer
+        // GpioInterface.
         // if inactive init on device
         if (!this.state) {
             this.state = {
-                pin: this.pin,
+                id: this.pin,
                 type: PIN_TYPE.PWM,
                 val: 0,
-                pwmChan: pwmChan
+                chan: pwmChan,
+                freq: 10000,
+                op: 'a',
+                res: 8,
             }
-            GpioInterface.initPinState(this.state)
+            GpioInterface.sendPinsBatch([this.state])
         } else {
             console.warn(`${this.pin} already active. To reinit, disable first`)
         }
@@ -127,7 +141,6 @@ export class GpioFactory {
                 break;
             default:
                 GpioFactory.instances[pin] = new Gpio(pin)
-
         }
         return GpioFactory.instances[pin]
     }
