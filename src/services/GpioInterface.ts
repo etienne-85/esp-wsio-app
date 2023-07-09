@@ -1,70 +1,56 @@
-import { WebSocketLayer } from "./WebSocketLayer";
+import { ServiceState, WebSocketService } from "./WebSocketLayer";
 
-export interface GpioValueStub {
-    pin,
-    val
-}
-
-export interface GpioStateStub extends GpioValueStub {
+export interface GpioPinStub {
+    id,
+    val,
     type,
-    pwmChan?,
+    default?,
+    chan?,
+    freq?,
+    res?,
+    op?
 }
 
 /**
  * interface with device
  * performs CRUD operations on GPIOs through websockets messages
  */
-export class GpioInterface {
-    static wsLayer = WebSocketLayer.instance('/gpio')
+export class GpioInterface extends WebSocketService {
+    static instance
+    static msgId = 0
+    static get singleton() {
+        GpioInterface.instance = GpioInterface.instance || new GpioInterface('/gpio')
+        return GpioInterface.instance
+    }
+    // static wsLayer = WebSocketLayer.instance('/gpio')
 
-    static connect(callback){
-        GpioInterface.wsLayer.init(callback)
+    // TODO check if better returning promise instead
+    static connect(stateCallback, onMsgCallback) {
+        if (GpioInterface.singleton.state === ServiceState.Disconnected)
+            GpioInterface.singleton.connect(stateCallback, onMsgCallback)
     }
 
     /**
-     * Init pin
+     * Send multiple pins as a batch
      */
-    static initPinState(pinState: GpioStateStub) {
-        GpioInterface.wsLayer.sendMsg({ pins: [pinState], action: "init" })
+    static sendPinsBatch(pins: [GpioPinStub]) {
+        const pinsBatch = {}
+        // const cmd = ""
+        const msgRefId = this.msgId++
+        pins.forEach(pin => pinsBatch[pin.id] = { ...pin })
+        GpioInterface.singleton.sendMsg({ msgRefId, pinsBatch })
     }
 
-    /**
-     * Read pin value
-     * @param pin 
-     */
-    static readPinValue(pin: Number): GpioValueStub {
-        const pinData: GpioValueStub = GpioInterface.wsLayer.sendMsg({ pins: [{ pin }], action: "read" })
-        return pinData
+    static config() {
+        const cmd = "config"
+        const msgRefId = this.msgId++
+        GpioInterface.singleton.sendMsg({ cmd, msgRefId })
     }
 
-    /**
-     * Write pin value
-     * @param pinData 
-     */
-    static writePinValue(pin, val) {
-        const pinData: GpioValueStub = {pin, val}
-        GpioInterface.wsLayer.sendMsg({ pins: [pinData], action: "write" })
+    static ping() {
+        const cmd = "ping"
+        const msgRefId = this.msgId++
+        GpioInterface.singleton.sendMsg({ cmd, msgRefId })
     }
 
-    /**
-     * Delete pin value
-     * @param pinData 
-     */
-    static deletePin(pin) {
-        GpioInterface.wsLayer.sendMsg({ pins: [{ pin }], action: "delete" })
-    }
-
-    /**
-     * Read pin state
-     */
-    static dumpPinState(pin) {
-        const pinState: GpioStateStub = GpioInterface.wsLayer.sendMsg({ pins: [{ pin }], action: "dump" })
-    }
-
-    /**
-     * Write multiple pins at once
-     */
-    static writeBatchValues(pinsArr: [GpioValueStub] ) {
-        GpioInterface.wsLayer.sendMsg({ pins: pinsArr, action: "batchWrite" })
-    }
 }

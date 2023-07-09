@@ -1,37 +1,59 @@
-import { AppGlobalState } from "../AppGlobalState"
+import { AppState } from "../AppState"
+
+export enum ServiceState {
+    Connected,
+    Disconnected,
+    Connecting
+}
+
 /**
  * Websocket layer to talk with device
  */
-export class WebSocketLayer {
-    static instances // services instance
-    state = false
+export class WebSocketService {
+    static instances: [WebSocketService] // services instance
     ws
+    path
+    state
+    stateCallback
+    onMsgCallback
+
+    get status() {
+        return this.state
+    }
+
+    set status(val) {
+        this.state = val
+        this.stateCallback?.(val)
+    }
 
     constructor(path) {
-        console.log(`[WebSocketLayer::constructor] path: ${path}`)
-        WebSocketLayer[path] = this
+        console.log(`[WebSocketService::constructor] path: ${path}`)
+        this.path = path
+        this.status = ServiceState.Disconnected
+        WebSocketService[path] = this
     }
 
-    static instance(path) {
-        return WebSocketLayer[path] || new WebSocketLayer(path)
-    }
+    // static instance(path): WebSocketService {
+    //     return WebSocketService[path] || new WebSocketService(path)
+    // }
 
-    init(onStateChange?) {
+    connect(stateChangeCallback?, onMsgCallback?) {
         console.log("[WebSocketLayer] init")
-        const connectionString = `ws://${AppGlobalState.deviceIp}/gpio`
-        console.log(`connecting to websocket: ${connectionString} `)
-        this.ws = new WebSocket(connectionString)
+        this.stateCallback = stateChangeCallback ? stateChangeCallback : (state) => console.log(`ws state change: ${state}`)
+        this.onMsgCallback = onMsgCallback ? onMsgCallback : (msg) => console.log(`message received: ${msg.msgId}`)
+        const wsAddress = `ws://${AppState.deviceIp}/gpio`
+        console.log(`connecting to websocket: ${wsAddress} `)
+        this.ws = new WebSocket(wsAddress)
+        this.status = ServiceState.Connecting
 
         this.ws.onopen = (event) => {
             console.log("[WebSocket] Connection opened");
-            this.state = true
-            onStateChange?.(true)
+            this.status = ServiceState.Connected
         };
 
         this.ws.onclose = (event) => {
             console.log("[WebSocket] Connection closed");
-            this.state = false
-            onStateChange?.(false)
+            this.status = ServiceState.Disconnected
             // setTimeout(initWebSocket, 2000);
         };
 
@@ -41,6 +63,7 @@ export class WebSocketLayer {
 
     onMsg(evt: MessageEvent<any>) {
         console.log(evt.data)
+        // this.onMsgCallback(evt.data)
         // WebSocketClientService.msgData = evt.data;
         // WebSocketClientService.msgCount++;
         // console.log(this.msgData);
@@ -50,11 +73,11 @@ export class WebSocketLayer {
      * Send data to websocket server
      */
     sendMsg(data) {
-        if (this.state) {
+        if (this.state === ServiceState.Connected) {
             const msg = JSON.stringify(data);
             try {
-                // this.ws.send(msg); //send msg to the server
                 console.log(data)
+                this.ws.send(msg); //send msg to device
             } catch (error) {
                 console.log(error); // catch error
             }

@@ -1,0 +1,1 @@
+export const DEFAULT_DEVICE_IP = "192.168.1.101"
