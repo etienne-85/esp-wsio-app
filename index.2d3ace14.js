@@ -27178,7 +27178,7 @@ var _espBenchmark = require("./EspBenchmark");
 var _gpioStateWatch = require("./GpioStateWatch");
 var _rovRemoteControl = require("./RovRemoteControl");
 var _s = $RefreshSig$();
-const DEVICE_DEFAULT_IP = "192.168.1.101";
+const DEVICE_DEFAULT_IP = "192.168.1.102";
 const EspDashboard = ()=>{
     _s();
     const device = (0, _appStateContext.useDevice)();
@@ -53176,7 +53176,7 @@ class WebSocketService {
         console.log("[WebSocketLayer] init");
         this.stateCallback = stateChangeCallback ? stateChangeCallback : (state)=>console.log(`ws state change: ${state}`);
         this.onMsgCallback = onMsgCallback ? onMsgCallback : (msg)=>console.log(`message received: ${msg.msgId}`);
-        const wsAddress = `ws://${(0, _appState.AppState).deviceIp}/gpio`;
+        const wsAddress = `wss://${(0, _appState.AppState).deviceIp}/gpio`;
         console.log(`connecting to websocket: ${wsAddress} `);
         this.ws = new WebSocket(wsAddress);
         this.status = ServiceState.Connecting;
