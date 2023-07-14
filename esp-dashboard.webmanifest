@@ -1,1 +1,0 @@
-{"name":"ESP control app","short_name":"espIO","description":"Web app to remotely control ESP GPIOs","icons":[{"src":"/esp-wsio/icon.8b2769c9.png","sizes":"192x192","type":"image/png"}],"start_url":"/esp-dashboard/index.html","display":"fullscreen","theme_color":"#B12A34","background_color":"#B12A34"}
