@@ -1,5 +1,5 @@
 import { DarkThemeToggle, Flowbite, Label, Navbar, TextInput, ToggleSwitch } from "flowbite-react";
-import React, { useState } from "react"; 
+import React, { useState } from "react";
 import { AppState } from "../AppState";
 import { useDeviceDispatch } from "../AppStateContext";
 
@@ -63,20 +63,21 @@ const DeviceInput = ({ defaultDeviceIp = AppState.deviceIp }) => {
  * Manages connection to device
  * @returns 
  */
-export const TopNavBar = ({defaultDeviceIp}) => {
+export const TopNavBar = ({ defaultDeviceIp }) => {
+    const logo = new URL('../icon192.png', import.meta.url);
     return (<>
         <Navbar
             fluid
             rounded
         >
-            <Navbar.Brand href="/">
-                {/* <img
-                    alt="Flowbite React Logo"
+            <Navbar.Brand href="/esp-wsio">
+                <img
+                    alt="ESP DashApp Logo"
                     className="mr-3 h-6 sm:h-9"
-                    src="/favicon.svg"
-                /> */}
+                    src={logo}
+                />
                 <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-                    ESP Dashboard
+                    Esp Dash App
                 </span>
             </Navbar.Brand>
             <Navbar.Toggle />
