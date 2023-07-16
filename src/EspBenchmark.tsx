@@ -1,19 +1,19 @@
-import React from "react"
-import { useEffect, useState, useMemo } from "react"
-import { useGpio } from "./AppStateContext";
+import React, { useEffect, useState, useMemo } from "react"
 import { GpioInterface } from "./services/GpioInterface";
 import { ServiceState } from "./services/WebSocketLayer";
 import { Button } from "flowbite-react";
+import { useServices } from "./AppStateContext";
 
 export const EspBenchmark = () => {
     const [refresh, setRefresh] = useState(false)
     const [pingDelay, setPingDelay] = useState(1)   // in seconds
 
     const timer: Date = useMemo(() => new Date(), []);
-    const gpio: any = useGpio();
+    const services: any = useServices();
+    const { gpio: gpioService } = services
 
     const ping = () => {
-        if (gpio.status === ServiceState.Connected) {
+        if (gpioService.status === ServiceState.Connected) {
             GpioInterface.ping()
         }
         // GpioInterface.dumpState()
@@ -21,9 +21,9 @@ export const EspBenchmark = () => {
     }
 
     useEffect(() => {
-        console.log(gpio)
-    }, [gpio])
-    console.log(`[GpioStateWatch] ${gpio.status}`)
+        console.log(gpioService)
+    }, [services])
+    console.log(`[GpioStateWatch] ${gpioService.status}`)
     return (<>
         <Button onClick={ping} size="xs">
             Ping

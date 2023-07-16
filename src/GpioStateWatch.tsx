@@ -1,7 +1,7 @@
 import { Button } from "flowbite-react"
 import React from "react"
 import { useEffect, useState } from "react"
-import { useDevice, useGpio } from "./AppStateContext"
+import { useServices } from "./AppStateContext"
 import { GpioStatusIndicator } from "./components/Common"
 import { Gpio, GpioFactory, PIN_TYPE } from "./model/Gpio"
 import { GpioInterface } from "./services/GpioInterface"
@@ -107,7 +107,7 @@ export const PinLayout = () => {
 
 export const GpioStateWatch = () => {
     const [refresh, setRefresh] = useState(false)
-    const gpio: any = useGpio();
+    const services: any = useServices();
 
     const dumpState = () => {
         // GpioInterface.dumpState()
@@ -115,15 +115,17 @@ export const GpioStateWatch = () => {
     }
 
     useEffect(() => {
-        console.log(gpio)
-    }, [gpio])
-    console.log(`[GpioStateWatch] ${gpio.status}`)
+        console.log(services)
+    }, [services])
+
+    const gpioService = services.gpio
+    console.log(`[GpioStateWatch] ${gpioService.status}`)
+
     return (<>
-        <GpioStatusIndicator />
         <Button onClick={dumpState} size="xs">
-            Dump State
+            Dump GPIO State
         </Button>
-        {gpio.status === ServiceState.Connected ? <PinLayout /> : "Waiting for GPIO access to be available"}
+        {gpioService.status === ServiceState.Connected ? <PinLayout /> : "Waiting for GPIO access to be available"}
 
     </>)
 }
