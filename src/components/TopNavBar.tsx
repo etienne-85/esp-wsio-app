@@ -3,15 +3,6 @@ import React, { useState } from "react";
 import { AppState } from "../AppState";
 import { useDeviceDispatch } from "../AppStateContext";
 
-export const FlowbiteWrapper = () => {
-    return (<>
-        {/* <Flowbite> */}
-        <TopNavBar defaultDeviceIp={undefined} />
-        <DarkThemeToggle />
-        {/* </Flowbite> */}
-    </>)
-}
-
 const DeviceInput = ({ defaultDeviceIp = AppState.deviceIp }) => {
     const [ipAddress, setIpAddress] = useState(defaultDeviceIp)
     const [isConnected, toggleConnection] = useState(false)

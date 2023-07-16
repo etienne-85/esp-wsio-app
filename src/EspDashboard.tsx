@@ -1,7 +1,6 @@
-import { DarkThemeToggle, Flowbite } from "flowbite-react"
+import { Flowbite } from "flowbite-react"
 import React from "react"
 import { DeviceProvider, ServicesProvider, useDevice } from "./AppStateContext"
-import { Navbar } from "./components/Navbar"
 import { TopNavBar } from "./components/TopNavBar"
 import { EspBenchmark } from "./EspBenchmark"
 import { GpioStateWatch } from "./GpioStateWatch"
@@ -18,8 +17,6 @@ export const EspDashboard = () => {
         <DeviceProvider>
             <Flowbite>
                 <TopNavBar defaultDeviceIp={DEVICE_DEFAULT_IP} />
-                {/* <Navbar /> */}
-                <DarkThemeToggle className="" />
             </Flowbite>
             {/* <Dashboard /> */}
             <ServicesProvider>
