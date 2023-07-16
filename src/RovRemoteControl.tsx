@@ -1,9 +1,9 @@
 import { useEffect, useState, useMemo, useRef } from "react"
-import { useGpio } from "./AppStateContext";
 import { MotorDriver, MotorStub } from "./model/Motor"
 import { RovDevice } from "./model/RovDevice";
 import { ServiceState } from "./services/WebSocketLayer";
 import { Button } from "flowbite-react";
+import { useServices } from "./AppStateContext";
 
 const MOTOR_L: MotorStub = { pin1: 26, chan1: 0, pin2: 25, chan2: 1 }
 const MOTOR_R: MotorStub = { pin1: 32, chan1: 2, pin2: 33, chan2: 3 }
@@ -16,14 +16,15 @@ const SpeedPresets = {
 
 export const RovRemoteControl = () => {
     const [speed, setSpeed] = useState(SpeedPresets.Slow)
-    const gpio = useGpio();
-    console.log(`isGpioAvailable: ${gpio.status}`)
+    const services = useServices();
+    const {gpio: gpioService} = services;
+    console.log(`isGpioAvailable: ${gpioService.status}`)
 
     useEffect(() => {
-        if (gpio.status === ServiceState.Connected && !RovDevice.singleton.isDeviceInit) {
+        if (gpioService.status === ServiceState.Connected && !RovDevice.singleton.isDeviceInit) {
             RovDevice.singleton.deviceInit()
         }
-    }, [gpio])
+    }, [services])
 
     useEffect(() => {
         RovDevice.singleton.init(MOTOR_L, MOTOR_R)

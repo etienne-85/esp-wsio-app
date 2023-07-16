@@ -6,6 +6,11 @@ export enum ServiceState {
     Connecting
 }
 
+export enum ServiceEventType {
+    ConnectionState,
+    WsMsg
+}
+
 /**
  * Websocket layer to talk with device
  */
@@ -14,8 +19,7 @@ export class WebSocketService {
     ws
     path
     state
-    stateCallback
-    onMsgCallback
+    eventNotifyCallback
 
     get status() {
         return this.state
@@ -23,7 +27,8 @@ export class WebSocketService {
 
     set status(val) {
         this.state = val
-        this.stateCallback?.(val)
+        const eventType = ServiceEventType.ConnectionState
+        this.eventNotifyCallback?.(eventType, { status: val })
     }
 
     constructor(path) {
@@ -37,11 +42,10 @@ export class WebSocketService {
     //     return WebSocketService[path] || new WebSocketService(path)
     // }
 
-    connect(stateChangeCallback?, onMsgCallback?) {
+    connect(notifyEvent?) {
         console.log("[WebSocketLayer] init")
-        this.stateCallback = stateChangeCallback ? stateChangeCallback : (state) => console.log(`ws state change: ${state}`)
-        this.onMsgCallback = onMsgCallback ? onMsgCallback : (msg) => console.log(`message received: ${msg.msgId}`)
-        const wsAddress = `ws://${AppState.deviceIp}/gpio`
+        this.eventNotifyCallback = notifyEvent ? notifyEvent : (event, state) => console.log(`event: ${event} state: ${state}`)
+        const wsAddress = `wss://${AppState.deviceIp}${this.path}`
         console.log(`connecting to websocket: ${wsAddress} `)
         this.ws = new WebSocket(wsAddress)
         this.status = ServiceState.Connecting

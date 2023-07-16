@@ -1,15 +1,15 @@
 import { DarkThemeToggle, Flowbite } from "flowbite-react"
 import React from "react"
-import { DeviceProvider, GpioProvider, useDevice } from "./AppStateContext"
-import { GpioServiceConnect } from "./components/Common"
+import { DeviceProvider, ServicesProvider, useDevice } from "./AppStateContext"
 import { Navbar } from "./components/Navbar"
 import { TopNavBar } from "./components/TopNavBar"
 import { EspBenchmark } from "./EspBenchmark"
 import { GpioStateWatch } from "./GpioStateWatch"
 import { RovRemoteControl } from "./RovRemoteControl"
-import { Dashboard } from "./Dashboard"
+import { StatusBar } from "./StatusBar"
+import { LogsMonitor } from "./LogsMonitor"
 
-const DEVICE_DEFAULT_IP = "192.168.1.101"
+const DEVICE_DEFAULT_IP = "192.168.4.1"
 
 export const EspDashboard = () => {
     const device: any = useDevice();
@@ -22,13 +22,15 @@ export const EspDashboard = () => {
                 <DarkThemeToggle className="" />
             </Flowbite>
             {/* <Dashboard /> */}
-            <GpioProvider>
-                <GpioServiceConnect>
-                    <RovRemoteControl />
-                    <GpioStateWatch />
-                    <EspBenchmark />
-                </GpioServiceConnect>
-            </GpioProvider>
+            <ServicesProvider>
+                {/* <ServicesStatus> */}
+                <RovRemoteControl />
+                <GpioStateWatch />
+                <EspBenchmark />
+                <LogsMonitor />
+                {/* </ServicesStatus> */}
+                <StatusBar />
+            </ServicesProvider>
         </DeviceProvider>
     </>)
 }

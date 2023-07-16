@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer } from 'react';
 import { AppState } from './AppState';
 import { DEFAULT_DEVICE_IP } from './config';
-import { ServiceState } from './services/WebSocketLayer';
+import { ServiceEventType, ServiceState } from './services/WebSocketLayer';
 
 /**
  * Device setup
@@ -49,44 +49,63 @@ export function useDeviceDispatch() {
 }
 
 /**
- *  GPIO wether available or not
+ *  Services states
  */
 
 // { available: false }
-const gpioInitialState = { status: ServiceState.Disconnected }
+const servicesInitialState = {
+    gpio: {
+        status: ServiceState.Disconnected
+    }, logs: {
+        status: ServiceState.Disconnected
+    }
+}
 
-const GpioContext = createContext(false);
-const GpioDispatchContext = createContext(null);
+const ServicesContext = createContext(false);
+const ServicesDispatchContext = createContext(null);
 
-function gpioStateReducer(gpioState, action) {
-    switch (action.type) {
-        case 'status': {
-            // TODO set ready
-            return ({ ...gpioState, status: action.status });
+function connectionStateReducer(service, stateData) {
+    switch (service) {
+        case 'gpio': {
+            return ({ 'gpio': { status: stateData.status } });
+        }
+        case 'logs': {
+            return ({ 'logs': { status: stateData.status } });
         }
         default: {
-            throw Error('Unknown action: ' + action.type);
+            throw Error('Unknown service: ' + stateData.service);
         }
     }
 }
 
+function servicesStateReducer(servicesState, srvState) {
+    const { service, event, data } = srvState
+    switch (event) {
+        case ServiceEventType.ConnectionState:
+            const connectionState = connectionStateReducer(service, data)
+            return ({ ...servicesState, ...connectionState })
+            break;
+    }
 
-export function GpioProvider({ children }) {
-    const [gpioService, dispatch] = useReducer(gpioStateReducer, gpioInitialState);
+}
+
+
+export function ServicesProvider({ children }) {
+    const [gpioService, dispatch] = useReducer(servicesStateReducer, servicesInitialState);
 
     return (
-        <GpioContext.Provider value={gpioService}>
-            <GpioDispatchContext.Provider value={dispatch}>
+        <ServicesContext.Provider value={gpioService}>
+            <ServicesDispatchContext.Provider value={dispatch}>
                 {children}
-            </GpioDispatchContext.Provider>
-        </GpioContext.Provider>
+            </ServicesDispatchContext.Provider>
+        </ServicesContext.Provider>
     );
 }
 
-export function useGpio() {
-    return useContext(GpioContext);
+export function useServices() {
+    return useContext(ServicesContext);
 }
 
-export function useGpioDispatch() {
-    return useContext(GpioDispatchContext);
+export function useServicesDispatch() {
+    return useContext(ServicesDispatchContext);
 }

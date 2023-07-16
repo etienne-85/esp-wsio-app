@@ -25,9 +25,9 @@ export class GpioInterface extends WebSocketService {
     // static wsLayer = WebSocketLayer.instance('/gpio')
 
     // TODO check if better returning promise instead
-    static connect(stateCallback, onMsgCallback) {
+    static connect(eventNotifyCallback) {
         if (GpioInterface.singleton.state === ServiceState.Disconnected)
-            GpioInterface.singleton.connect(stateCallback, onMsgCallback)
+            GpioInterface.singleton.connect(eventNotifyCallback)
     }
 
     /**
