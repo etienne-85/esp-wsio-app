@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
 import { useDevice, useServicesDispatch, useServices } from "./AppStateContext";
+import { SubTitle } from "./components/Common";
+import { FsService } from "./services/FsService";
 import { GpioInterface } from "./services/GpioInterface";
 import { LogService } from "./services/LogService";
-import { ServiceState } from "./services/WebSocketLayer";
+import { ServiceEvent, ServiceState } from "./services/WebSocketLayer";
 
 export const ServicesStatus = () => {
     const device: any = useDevice();
@@ -10,18 +12,20 @@ export const ServicesStatus = () => {
 
     // forward service event states to context
     const onServiceEvent = (service, event, data) => {
-        console.log(`Service ${service}, event ${event}`)
+        console.log(`Service \"${service}\", event ${event}`)
         const serviceState = {
             service,
             event,
             data
         }
         switch (event) {
-            case 'state':
-                console.log(`${data ? 'available' : 'unavailable'}`)
+            case ServiceEvent.ServiceState:
+                const { status } = data
+                console.log(`${status === ServiceState.Connected ? 'available' : 'unavailable'}`)
                 break;
-            case 'msg':
-                const { msgId } = data
+            case ServiceEvent.Message:
+                const { msg } = data
+                console.log(msg)
                 break;
         }
         // forward service state to react context
@@ -33,12 +37,13 @@ export const ServicesStatus = () => {
             console.log("[GpioServiceConnect] connecting")
             GpioInterface.connect((evt, data) => onServiceEvent('gpio', evt, data))
             LogService.connect((evt, data) => onServiceEvent('logs', evt, data))
+            // FsService.connect((evt, data) => onServiceEvent('fs', evt, data))
         }
     }, [device])
 
     // return (device?.ready ? children : "Waiting for device setup")
     return (<>
-        Services status
+        <SubTitle>Status</SubTitle>
         {/* <GpioStatusIndicator /> */}
     </>)
 }
@@ -72,9 +77,10 @@ const getCustomStyle = (status) => {
 
 export const StatusIndicators = () => {
     const services = useServices();
-    const { gpio: gpioService, logs: logService } = services;
+    const { gpio: gpioService, logs: logService, fs: fsService } = services;
     const gpioStyle = getCustomStyle(gpioService.status)
     const logStyle = getCustomStyle(logService.status)
+    const fsStyle = getCustomStyle(fsService.status)
 
     return (<>
         <span className={gpioStyle.main}>
@@ -84,6 +90,10 @@ export const StatusIndicators = () => {
         <span className={logStyle.main}>
             <span className={logStyle.secondary}></span>
             LOGS
+        </span>
+        <span className={fsStyle.main}>
+            <span className={fsStyle.secondary}></span>
+            FS
         </span>
     </>)
 }

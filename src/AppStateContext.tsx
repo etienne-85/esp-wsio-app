@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer } from 'react';
 import { AppState } from './AppState';
 import { DEFAULT_DEVICE_IP } from './config';
-import { ServiceEventType, ServiceState } from './services/WebSocketLayer';
+import { ServiceEvent, ServiceState } from './services/WebSocketLayer';
 
 /**
  * Device setup
@@ -26,7 +26,6 @@ function deviceStateReducer(deviceState, action) {
         }
     }
 }
-
 
 export function DeviceProvider({ children }) {
     const [deviceState, dispatch] = useReducer(deviceStateReducer, deviceInitialState);
@@ -56,7 +55,11 @@ export function useDeviceDispatch() {
 const servicesInitialState = {
     gpio: {
         status: ServiceState.Disconnected
-    }, logs: {
+    }, 
+    logs: {
+        status: ServiceState.Disconnected
+    },
+    fs: {
         status: ServiceState.Disconnected
     }
 }
@@ -64,13 +67,16 @@ const servicesInitialState = {
 const ServicesContext = createContext(false);
 const ServicesDispatchContext = createContext(null);
 
-function connectionStateReducer(service, stateData) {
+function serviceStateReducer(service, stateData) {
     switch (service) {
         case 'gpio': {
             return ({ 'gpio': { status: stateData.status } });
         }
         case 'logs': {
             return ({ 'logs': { status: stateData.status } });
+        }
+        case 'fs': {
+            return ({ 'fs': { status: stateData.status } });
         }
         default: {
             throw Error('Unknown service: ' + stateData.service);
@@ -81,8 +87,8 @@ function connectionStateReducer(service, stateData) {
 function servicesStateReducer(servicesState, srvState) {
     const { service, event, data } = srvState
     switch (event) {
-        case ServiceEventType.ConnectionState:
-            const connectionState = connectionStateReducer(service, data)
+        case ServiceEvent.ServiceState:
+            const connectionState = serviceStateReducer(service, data)
             return ({ ...servicesState, ...connectionState })
             break;
     }

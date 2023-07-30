@@ -1,8 +1,7 @@
 import { ServiceState, WebSocketService } from "./WebSocketLayer";
 
 /**
- * interface with device
- * performs CRUD operations on GPIOs through websockets messages
+ * Interface with LOGS service API
  */
 export class LogService extends WebSocketService {
     static instance
@@ -20,7 +19,13 @@ export class LogService extends WebSocketService {
     }
 
     static dumpLogs() {
-        const cmd = "dump"
+        const cmd = "current"
+        // const msgRefId = this.msgId++
+        LogService.singleton.sendMsg({ cmd })
+    }
+
+    static dumpPrevLogs() {
+        const cmd = "previous"
         // const msgRefId = this.msgId++
         LogService.singleton.sendMsg({ cmd })
     }

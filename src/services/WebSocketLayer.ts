@@ -6,9 +6,9 @@ export enum ServiceState {
     Connecting
 }
 
-export enum ServiceEventType {
-    ConnectionState,
-    WsMsg
+export enum ServiceEvent {
+    ServiceState,
+    Message
 }
 
 /**
@@ -27,7 +27,7 @@ export class WebSocketService {
 
     set status(val) {
         this.state = val
-        const eventType = ServiceEventType.ConnectionState
+        const eventType = ServiceEvent.ServiceState
         this.eventNotifyCallback?.(eventType, { status: val })
     }
 
@@ -65,8 +65,10 @@ export class WebSocketService {
 
     }
 
-    onMsg(evt: MessageEvent<any>) {
+    onMsg = (evt: MessageEvent<any>) => {
         console.log(evt.data)
+        const eventType = ServiceEvent.Message
+        // this.eventNotifyCallback?.(eventType, { msg: evt.data })
         // this.onMsgCallback(evt.data)
         // WebSocketClientService.msgData = evt.data;
         // WebSocketClientService.msgCount++;

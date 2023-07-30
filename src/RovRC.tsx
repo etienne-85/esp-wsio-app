@@ -1,12 +1,13 @@
-import { useEffect, useState, useMemo, useRef } from "react"
+import React, { useEffect, useState, useMemo, useRef } from "react"
 import { MotorDriver, MotorStub } from "./model/Motor"
 import { RovDevice } from "./model/RovDevice";
 import { ServiceState } from "./services/WebSocketLayer";
 import { Button } from "flowbite-react";
 import { useServices } from "./AppStateContext";
+import { Panel, SubTitle, Title } from "./components/Common";
 
-const MOTOR_L: MotorStub = { pin1: 26, chan1: 0, pin2: 25, chan2: 1 }
-const MOTOR_R: MotorStub = { pin1: 32, chan1: 2, pin2: 33, chan2: 3 }
+const MOTOR_L: MotorStub = { pin1: 15, chan1: 0, pin2: 16, chan2: 1 }
+const MOTOR_R: MotorStub = { pin1: 17, chan1: 2, pin2: 18, chan2: 3 }
 
 const SpeedPresets = {
     Slow: 88,
@@ -14,11 +15,19 @@ const SpeedPresets = {
     Fast: 160
 }
 
-export const RovRemoteControl = () => {
+export const RovRC = () => {
+    return (
+        <Panel title={"ROV control"} subtitle={""}>
+            <RCLayout />
+        </Panel>
+    )
+}
+
+const RCLayout = () => {
     const [speed, setSpeed] = useState(SpeedPresets.Slow)
     const services = useServices();
-    const {gpio: gpioService} = services;
-    console.log(`isGpioAvailable: ${gpioService.status}`)
+    const { gpio: gpioService } = services;
+    // console.log(`isGpioAvailable: ${gpioService.status}`)
 
     useEffect(() => {
         if (gpioService.status === ServiceState.Connected && !RovDevice.singleton.isDeviceInit) {
@@ -33,7 +42,6 @@ export const RovRemoteControl = () => {
 
     // const motorMower = useMemo(()=> new MotorDriver(32, 4, 33, 5))
     return (<>
-        <h2>ROV Remote Control</h2>
         <div className="grid grid-cols-5 gap-4 w-1/3">
             <div></div>
             <Button className="w-24" onClick={() => RovDevice.singleton.move(speed)}>
