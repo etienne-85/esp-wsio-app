@@ -68,7 +68,7 @@ export const TopNavBar = ({ defaultDeviceIp }) => {
                     src={logo}
                 />
                 <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-                    Esp Dash App
+                    EspIO App
                 </span>
             </Navbar.Brand>
             <Navbar.Toggle />
