@@ -1,21 +1,25 @@
 import { DarkThemeToggle, Flowbite, Label, Navbar, TextInput, ToggleSwitch } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AppState } from "../AppState";
-import { useDeviceDispatch } from "../AppStateContext";
+import { RemoteService } from "../services/RemoteService";
+// import { useRemoteService } from "./hooks";
+// import { useDeviceDispatch } from "../AppStateContext";
 
-const DeviceInput = ({ defaultDeviceIp = AppState.deviceIp }) => {
-    const [ipAddress, setIpAddress] = useState(defaultDeviceIp)
-    const [isConnected, toggleConnection] = useState(false)
-    const deviceDispatch = useDeviceDispatch();
-
+const IpAddressInput = () => {
+    // const [status] = useRemoteService()
+    const [ipAddress, setIpAddress] = useState("192.168.1.101")
+    // const deviceDispatch = useDeviceDispatch();
+    const status = RemoteService.connectionState
     const onConnect = () => {
-        deviceDispatch({
-            type: 'setup',
-            ip: ipAddress,
-        })
+        // deviceDispatch({
+        //     type: 'setup',
+        //     ip: ipAddress,
+        // })
+        // AppState.initState = true
         console.log(ipAddress)
-        AppState.initState = true
-        toggleConnection(current => !current)
+        RemoteService.deviceIp = ipAddress
+        RemoteService.autoconnect()
+        // setDeviceIp(ipAddress)
     }
     return (<>
         <form className="flex items-center">
@@ -54,8 +58,8 @@ const DeviceInput = ({ defaultDeviceIp = AppState.deviceIp }) => {
  * Manages connection to device
  * @returns 
  */
-export const TopNavBar = ({ defaultDeviceIp }) => {
-    const logo = new URL('../icon192.png', import.meta.url);
+export const AppNavbar = () => {
+    const logo = new URL('../assets/icons/icon192.png', import.meta.url);
     return (<>
         <Navbar
             fluid
@@ -81,7 +85,7 @@ export const TopNavBar = ({ defaultDeviceIp }) => {
                 <Navbar.Link href="#">
                     Services
                 </Navbar.Link> */}
-                <DeviceInput defaultDeviceIp={defaultDeviceIp} />
+                <IpAddressInput />
                 <DarkThemeToggle />
                 {/* <TextInput
                     addon="@"

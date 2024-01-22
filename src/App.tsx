@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { EspDashboard } from "./EspDashboard";
+import { DashboardApp } from "./DashboardApp";
 import "./index.css"
 
 export const App = () => {
-  return (<EspDashboard />);
+  return (<DashboardApp />);
 }
