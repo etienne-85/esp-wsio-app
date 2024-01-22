@@ -68,7 +68,7 @@ export class WebSocketService {
     onMsg = (evt: MessageEvent<any>) => {
         console.log(evt.data)
         const eventType = ServiceEvent.Message
-        // this.eventNotifyCallback?.(eventType, { msg: evt.data })
+        this.eventNotifyCallback?.(eventType, { msg: evt.data })
         // this.onMsgCallback(evt.data)
         // WebSocketClientService.msgData = evt.data;
         // WebSocketClientService.msgCount++;

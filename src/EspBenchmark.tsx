@@ -21,9 +21,9 @@ export const EspBenchmark = () => {
     }
 
     useEffect(() => {
-        console.log(gpioService)
+        // console.log(gpioService)
     }, [services])
-    console.log(`[GpioStateWatch] ${gpioService.status}`)
+    // console.log(`[GpioStateWatch] ${gpioService.status}`)
     return (<>
         <Button onClick={ping} size="xs">
             Ping

@@ -22,7 +22,7 @@
     "watch-static": "parcel src/index.html --public-url /esp-wsio/",
     "build-gh": "parcel build src/index.html --public-url /esp-wsio/",
     "deploy-gh": "gh-pages -d dist",
-    "clean": "rm -rf dist/",
+    "clean": "rm -rf dist/*",
     "clean-all": "rm -rf dist/ .parcel-cache/ node_modules/",
     "build-deploy": "yarn clean && yarn build-gh && yarn deploy-gh"
   }
