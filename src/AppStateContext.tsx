@@ -55,7 +55,7 @@ export function useDeviceDispatch() {
 const servicesInitialState = {
     gpio: {
         status: ServiceState.Disconnected
-    }, 
+    },
     logs: {
         status: ServiceState.Disconnected
     },
@@ -79,22 +79,48 @@ function serviceStateReducer(service, stateData) {
             return ({ 'fs': { status: stateData.status } });
         }
         default: {
-            throw Error('Unknown service: ' + stateData.service);
+            throw Error('Unknown service: ' + service);
         }
     }
 }
 
-function servicesStateReducer(servicesState, srvState) {
-    const { service, event, data } = srvState
+function serviceMessageReducer(service, stateData) {
+    const msgData = stateData.msg
+    switch (service) {
+        case 'gpio': {
+            return ({ 'gpio': { msg: msgData } });
+        }
+        case 'logs': {
+            return ({ 'logs': { msg: msgData } });
+        }
+        case 'fs': {
+            return ({ 'fs': { msg: msgData } });
+        }
+        default: {
+            throw Error('Unknown service: ' + service);
+        }
+    }
+}
+
+function servicesStateReducer(currentState, newServiceState) {
+    const { service, event, data } = newServiceState
+    const serviceState = currentState[service]
     switch (event) {
         case ServiceEvent.ServiceState:
-            const connectionState = serviceStateReducer(service, data)
-            return ({ ...servicesState, ...connectionState })
-            break;
+            {
+                const status = serviceStateReducer(service, data)
+                const newServiceState = { ...serviceState, status }
+                return ({ ...currentState, ...newServiceState })
+            }
+        case ServiceEvent.Message:
+            {
+                const msg = serviceMessageReducer(service, data)
+                const newServiceState = { ...serviceState, msg }
+                return ({ ...currentState, ...newServiceState })
+            }
     }
 
 }
-
 
 export function ServicesProvider({ children }) {
     const [gpioService, dispatch] = useReducer(servicesStateReducer, servicesInitialState);
