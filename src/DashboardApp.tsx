@@ -1,5 +1,4 @@
-import React, { useState } from "react"
-import { Flowbite } from "flowbite-react"
+import { useState } from "react"
 import { LogsMonitor } from "./components/LogsMon"
 import { RemoteService } from "./services/RemoteService"
 import { StatusBar } from "./components/StatusBar"
@@ -7,12 +6,12 @@ import { AppNavbar } from "./components/Navbar"
 
 const DEVICE_DEFAULT_IP = "192.168.4.1"
 
+
 export const DashboardApp = () => {
     const [refresh, setRefresh] = useState(false)
     RemoteService.notifyChange = () => setRefresh(current => !current)
     return (<>
-        {/* <Flowbite theme={{ theme }}> */}
-        <Flowbite>
+        {/* <ThemeProvider theme={mainTheme}> */}
             <AppNavbar />
             <LogsMonitor />
             <StatusBar />
@@ -32,6 +31,6 @@ export const DashboardApp = () => {
                 </ServicesProvider> */}
             {/* <Dashboard /> */}
             {/* </DeviceProvider> */}
-        </Flowbite>
+        {/* </ThemeProvider> */}
     </>)
 }

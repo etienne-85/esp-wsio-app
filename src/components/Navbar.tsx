@@ -1,6 +1,5 @@
-import { DarkThemeToggle, Flowbite, Label, Navbar, TextInput, ToggleSwitch } from "flowbite-react";
-import React, { useEffect, useState } from "react";
-import { AppState } from "../AppState";
+import { DarkThemeToggle, Navbar, NavbarBrand, NavbarCollapse, NavbarToggle } from "flowbite-react";
+import { useState } from "react";
 import { RemoteService } from "../services/RemoteService";
 // import { useRemoteService } from "./hooks";
 // import { useDeviceDispatch } from "../AppStateContext";
@@ -65,18 +64,18 @@ export const AppNavbar = () => {
             fluid
             rounded
         >
-            <Navbar.Brand href="/esp-wsio">
+            <NavbarBrand href="/esp-wsio">
                 <img
                     alt="ESP DashApp Logo"
                     className="mr-3 h-6 sm:h-9"
                     src={logo}
                 />
                 <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-                    EspIO App
+                    Esp WsIO
                 </span>
-            </Navbar.Brand>
-            <Navbar.Toggle />
-            <Navbar.Collapse>
+            </NavbarBrand>
+            <NavbarToggle />
+            <NavbarCollapse>
                 {/* <Navbar.Link href="#">
                     <p>
                         Home
@@ -106,6 +105,6 @@ export const AppNavbar = () => {
                         <span className="sr-only">Search</span>
                     </button>
                 </div> */}
-            </Navbar.Collapse>
+            </NavbarCollapse>
         </Navbar></>)
 }
