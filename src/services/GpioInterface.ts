@@ -16,7 +16,7 @@ export interface GpioPinStub {
  * performs CRUD operations on GPIOs through websockets messages
  */
 export class GpioInterface extends WebSocketService {
-    static instance
+    static instance: GpioInterface
     static msgId = 0
     static get singleton() {
         GpioInterface.instance = GpioInterface.instance || new GpioInterface('/gpio')

@@ -1,8 +1,6 @@
-import { AppState } from "../AppState"
-
 const DEFAULT_MIN_TIMEOUT = 250 // ms
 const SERVICE_DEFAULT_ROUTE = "/ws"
-const PING_RATE = 1000  // ms
+// const PING_RATE = 1000  // ms
 
 export enum ConnectionState {
     Connected = "connected",
@@ -10,15 +8,21 @@ export enum ConnectionState {
     Connecting = "connecting"
 }
 
+type EspWsMsg = {
+    id: number,
+    cmd: string,
+    obj: any
+}
+
 export class RemoteService {
-    static registeredServices = {}
+    static registeredServices: Record<string, RemoteService> = {}
     // static deviceIp
-    static webSocket
-    static connectionState
+    static webSocket: WebSocket | null
+    static connectionState: ConnectionState
     static retryCounter = 0
     static timeout = DEFAULT_MIN_TIMEOUT
-    static deviceIp
-    static notifyChange
+    static deviceIp: string
+    static notifyChange: any
     static stats = {
         packets: {
             sent: 0,
@@ -35,7 +39,7 @@ export class RemoteService {
     }
     serviceId
 
-    constructor(serviceId) {
+    constructor(serviceId: string) {
         this.serviceId = serviceId
         RemoteService.registeredServices[serviceId] = this
     }
@@ -101,7 +105,7 @@ export class RemoteService {
 
     static onWsError = (err) => {
         console.error(`[RemoteService::onWsError] connection failed with error: `, err.message, `(${RemoteService.retryCounter} failed attempts)`);
-        RemoteService.webSocket.close();
+        RemoteService.webSocket?.close();
     }
 
     // routing message to corresponding service
@@ -112,7 +116,8 @@ export class RemoteService {
         RemoteService.stats.packets.received++
         const incomingMsg = evt.data
         const parsedMsg = JSON.parse(incomingMsg)
-        const { serviceId, output } = parsedMsg
+        const { cmd, id, obj } = parsedMsg as EspWsMsg
+        const [serviceId, action] = cmd.split(':')
         const service: RemoteService = RemoteService.registeredServices[serviceId]
         if (service) {
             console.log(`[RemoteService::onWsMessage] message received from ${serviceId} service `, parsedMsg)
@@ -162,7 +167,7 @@ export class RemoteService {
                 if (!RemoteService.stats.packets.lastReceivedTime) {
                     console.warn(`[RemoteService::sendMsg] previous packet was lost`)
                 }
-                RemoteService.webSocket.send(outgoingMsg); //send msg to device
+                RemoteService.webSocket?.send(outgoingMsg); //send msg to device
                 RemoteService.stats.packets.lastSentTime = Date.now()
                 RemoteService.stats.packets.sent++
                 RemoteService.stats.packets.lastReceivedTime = 0

@@ -1,11 +1,10 @@
 import { Button } from "flowbite-react"
-import React from "react"
 import { useEffect, useState } from "react"
 import { useServices } from "./AppStateContext"
-import { GpioStatusIndicator } from "./components/Common"
 import { Gpio, GpioFactory, PIN_TYPE } from "./model/Gpio"
-import { GpioInterface } from "./services/GpioInterface"
 import { ServiceState } from "./services/WebSocketLayer"
+// import { GpioInterface } from "./services/GpioInterface"
+// import { GpioStatusIndicator } from "./components/Common"
 
 import { Badge } from 'flowbite-react';
 
@@ -45,9 +44,8 @@ const GpioStateControl = ({ gpio }: { gpio: Gpio }) => {
 }
 
 const GpioRow = ({ gpio }: { gpio: Gpio }) => {
-    const [editMode, toggleEdit] = useState(false)
-    const [pinValue, setPinValue] = useState(0)
-
+    // const [editMode, toggleEdit] = useState(false)
+    // const [pinValue, setPinValue] = useState(0)
 
     return (<>
         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -106,7 +104,7 @@ export const PinLayout = () => {
 }
 
 export const GpioStateWatch = () => {
-    const [refresh, setRefresh] = useState(false)
+    const [, setRefresh] = useState(false)
     const services: any = useServices();
 
     const dumpState = () => {

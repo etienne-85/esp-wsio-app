@@ -38,6 +38,6 @@ export class LogRemoteService extends RemoteService {
         const data = {
             cmd
         }
-        this.sendMsg(data)
+        // this.sendMsg(data)
     }
 }
